@@ -1149,7 +1149,20 @@ bool PrgBody::superfluousHead(const LogicProgram& prg, const PrgHead* head, PrgE
 		// check each contained atom
 		const PrgDisj* dis = static_cast<const PrgDisj*>(head);
 		for (PrgDisj::atom_iterator aIt = dis->begin(), aEnd = dis->end(); aIt != aEnd; ++aIt) {
-			if (rs.inBody(posLit(*aIt)) || rs.inHead(*aIt)) {
+			if (rs.inBody(posLit(*aIt))) {
+				// as for atoms: only if the body cannot be true without the atom
+				weight_t w = 1;
+				if (hasWeights()) {
+					const Literal* lits = aggData().lits;
+					const Literal* x    = std::find(lits, lits + size(), posLit(*aIt));
+					assert(x != lits + size());
+					w = sumData()->weights[ x - lits ];
+				}
+				if ((sumW() - w) < bound()) {
+					return true;
+				}
+			}
+			if (rs.inHead(*aIt)) {
 				return true;
 			}
 			if (prg.isFact(prg.getAtom(*aIt))) {
