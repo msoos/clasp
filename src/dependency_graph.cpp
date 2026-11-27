@@ -526,7 +526,7 @@ void PrgDepGraph::NonHcfComponent::ComponentMap::addBodyConstraints(const Solver
 				MapIt_c atMapped = findAtom(*hIt);
 				assert(atMapped != atoms().second);
 				cc.add(~atMapped->up());
-				cc.end();
+				if (!comp.master()->hasConflict()) { cc.end(); }
 			}
 			else { // disjunctive head
 				const NodeId* dHead = ++hIt;
@@ -542,7 +542,8 @@ void PrgDepGraph::NonHcfComponent::ComponentMap::addBodyConstraints(const Solver
 							dc.add(atMapped->hp());
 						}
 					}
-					dc.end();
+					// an inconsistent tester stays so: no need to add more
+					if (!comp.master()->hasConflict()) { dc.end(); }
 				}
 			}
 		}
