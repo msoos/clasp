@@ -923,7 +923,7 @@ bool AcyclicityCheck::init(Solver& s) {
 	todo_.clear();
 	solver_ = &s;
 	genId_  = graph_->attach(s, *this, genId_);
-	return true;
+	return !s.hasConflict();
 }
 
 uint32 AcyclicityCheck::startSearch() {
